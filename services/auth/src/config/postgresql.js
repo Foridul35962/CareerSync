@@ -1,7 +1,11 @@
-import { neon } from '@neondatabase/serverless'
+import pg from "pg";
 import dotenv from 'dotenv'
 dotenv.config()
 
-const sql = neon(process.env.DB_URL)
+const { Pool } = pg;
+
+const sql = new Pool({
+    connectionString: process.env.DB_URL,
+});
 
 export default sql

@@ -2,16 +2,16 @@ import sql from "../config/postgresql.js";
 
 const createUserTable = async () => {
   try {
-    await sql`
+    await sql.query(`
       DO $$
       BEGIN
         IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'user_role') THEN
           CREATE TYPE user_role AS ENUM ('jobseeker', 'recruiter');
         END IF;
       END$$;
-    `;
+    `);
 
-    await sql`
+    await sql.query(`
       CREATE TABLE IF NOT EXISTS users (
         _id SERIAL PRIMARY KEY,
         name VARCHAR(200) NOT NULL,
@@ -27,7 +27,7 @@ const createUserTable = async () => {
         created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
         subscription TIMESTAMPTZ
       );
-    `;
+    `);
 
   } catch (error) {
     console.log("User model create failed", error);
