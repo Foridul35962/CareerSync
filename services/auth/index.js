@@ -9,4 +9,7 @@ connectDB().then(() => {
     app.listen(PORT, () => {
         console.log(`auth service is running on http://localhost:${PORT}`)
     })
+}).catch((error) => {
+    console.error("DB connection failed:", error);
+    throw error;
 })
