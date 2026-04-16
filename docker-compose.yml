@@ -43,6 +43,24 @@ services:
     networks:
       - careersync-net
 
+  gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    container_name: CareerSyncApiGateway
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    depends_on:
+      - auth
+    env_file:
+      - .env.docker
+    volumes:
+      - ./gateway:/app
+      - /app/node_modules
+    networks:
+      - careersync-net
+
   zookeeper:
     image: confluentinc/cp-zookeeper:7.5.0
     container_name: CareerSyncZookeeper
