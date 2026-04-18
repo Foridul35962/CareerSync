@@ -538,3 +538,44 @@ export const resendOtp = AsyncHandler(async (req, res) => {
             new ApiResponse(200, {}, 'otp resended')
         )
 })
+
+export const getUser = AsyncHandler(async (req, res) => {
+    const { token } = req.cookies
+    if (!token) {
+        throw new ApiErrors(401, "unauthorized access")
+    }
+
+    let decoded
+    try {
+        decoded = jwt.verify(token, process.env.TOKEN_SECRET)
+    } catch (error) {
+        throw new ApiErrors(401, "unauthorized access")
+    }
+
+    if (!decoded) {
+        throw new ApiErrors(401, "unauthorized access")
+    }
+
+    const userId = decoded.userId
+    const result = await sql.query(`
+        SELECT *
+        FROM users
+        WHERE _id=$1
+        `, [userId]
+    )
+
+    if (!result.rows[0]) {
+        throw new ApiErrors(404, "user is not found")
+    }
+    const user = result.rows[0]
+
+    delete user.password
+    delete user.profile_pic_public_id
+    delete user.resume_public_id
+
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(200, user, "user fetch done")
+        )
+})

@@ -112,14 +112,31 @@ export const resendOtp = createAsyncThunk(
     }
 )
 
+export const getUser = createAsyncThunk(
+    "auth/get-user",
+    async (_: null, { rejectWithValue }) => {
+        try {
+            const res = await axios.get(`${SERVER_URL}/get-user`,
+                { withCredentials: true }
+            )
+            return res.data
+        } catch (error) {
+            const err = error as AxiosError<any>
+            return rejectWithValue(err?.response?.data || "Something went wrong")
+        }
+    }
+)
+
 interface initialStateType {
     authLoading: boolean
     resendOtpLoading: boolean
+    fetchUser: boolean
     user: userType | null
 }
 
 const initialState: initialStateType = {
     authLoading: false,
+    fetchUser: false,
     resendOtpLoading: false,
     user: null
 }
@@ -207,6 +224,18 @@ const authSlice = createSlice({
             })
             .addCase(resendOtp.rejected, (state) => {
                 state.resendOtpLoading = false
+            })
+        //get user
+        builder
+            .addCase(getUser.pending, (state) => {
+                state.fetchUser = false
+            })
+            .addCase(getUser.fulfilled, (state, action) => {
+                state.fetchUser = true
+                state.user = action.payload.data
+            })
+            .addCase(getUser.rejected, (state) => {
+                state.fetchUser = true
             })
     }
 })
