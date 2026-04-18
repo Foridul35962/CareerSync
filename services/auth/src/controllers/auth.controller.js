@@ -233,6 +233,7 @@ export const login = [
 
         user.password = undefined
         user.profile_pic_public_id = undefined
+        user.resume_public_id = undefined
 
         await redis.del(limitKey)
 

@@ -9,7 +9,7 @@ authRouter.post('/login', authController.login)
 authRouter.get('/logout', authController.logout)
 authRouter.post('/forget-pass', authController.forgetPass)
 authRouter.post('/verify-forget-pass', authController.verifyPass)
-authRouter.post('/reset-pass', authController.resetPass)
+authRouter.patch('/reset-pass', authController.resetPass)
 authRouter.post('/resend-otp', authController.resendOtp)
 
 export default authRouter
