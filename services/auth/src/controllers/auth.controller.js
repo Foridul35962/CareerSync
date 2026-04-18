@@ -6,6 +6,7 @@ import { check, validationResult } from 'express-validator'
 import bcrypt from 'bcryptjs'
 import ApiResponse from "../helpers/ApiResponse.js";
 import jwt from 'jsonwebtoken'
+import { publishMail } from "../kafka/topics.js";
 
 export const registration = [
     check('name')
@@ -67,7 +68,12 @@ export const registration = [
         const otp = Math.floor(100000 + Math.random() * 900000).toString()
 
         //send mail
-
+        const message = {
+            otp,
+            email,
+            type: "registration"
+        }
+        publishMail(message)
 
         const coolDownKey = `coolDownMail:${email}`
         await redis.set(coolDownKey, "1", "EX", 60)
@@ -307,7 +313,12 @@ export const forgetPass = AsyncHandler(async (req, res) => {
     const otp = Math.floor(100000 + Math.random() * 900000).toString()
 
     //send mail
-
+    const message = {
+        otp,
+        email,
+        type: "forgetPass"
+    }
+    publishMail(message)
 
     const coolDownKey = `coolDownMail:${email}`
 
@@ -513,6 +524,12 @@ export const resendOtp = AsyncHandler(async (req, res) => {
     }
 
     //send mail
+    const message = {
+        otp,
+        email,
+        type: mailType
+    }
+    publishMail(message)
 
     return res
         .status(200)
