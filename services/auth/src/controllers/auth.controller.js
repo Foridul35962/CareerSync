@@ -506,7 +506,7 @@ export const resendOtp = AsyncHandler(async (req, res) => {
             email: redisValues.email,
             role: redisValues.role,
             phone_number: redisValues.phone_number,
-            password: redisValues.hashPassword,
+            password: redisValues.password,
             otp: otp,
             verify: false
         }), "EX", 300)
