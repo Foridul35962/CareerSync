@@ -9,6 +9,7 @@ const GetUser = () => {
     const dispatch = useDispatch<AppDispatch>()
     useEffect(() => {
         dispatch(getUser(null)).unwrap()
+            .catch(() => { })
     }, [])
     return null
 }
