@@ -5,11 +5,17 @@ import { motion } from 'framer-motion';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/store/store';
 import { ShieldCheck, Loader2, RotateCcw } from 'lucide-react';
-import { resendOtp, verifyRegi } from '@/store/slice/authSlice';
+import { resendOtp, verifyForgetPass, verifyRegi } from '@/store/slice/authSlice';
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
 
-const VerifyOtp = ({ email }: { email: string }) => {
+interface verifyOtpTypes {
+    email: string,
+    verifyType: 'registration' | 'forgetPass',
+    setVerify?: React.Dispatch<React.SetStateAction<boolean>>
+}
+
+const VerifyOtp = ({ email, verifyType, setVerify }: verifyOtpTypes) => {
     const dispatch = useDispatch<AppDispatch>();
     const { authLoading } = useSelector((state: RootState) => state.auth);
     const router = useRouter();
@@ -57,9 +63,16 @@ const VerifyOtp = ({ email }: { email: string }) => {
         const otpString = otp.join("");
         if (otpString.length === 6) {
             try {
-                await dispatch(verifyRegi({ email, otp: otpString })).unwrap();
-                toast.success("Registration verified!");
-                router.push('/login');
+                if (verifyType === 'registration') {
+                    await dispatch(verifyRegi({ email, otp: otpString })).unwrap();
+                    toast.success("Registration verified!");
+                    router.push('/login');
+                } else if (verifyType === 'forgetPass') {
+                    await dispatch(verifyForgetPass({ email, otp: otpString })).unwrap()
+                    if (setVerify) {
+                        setVerify(true)
+                    }
+                }
             } catch (error: any) {
                 toast.error(error.message);
             }
@@ -69,7 +82,7 @@ const VerifyOtp = ({ email }: { email: string }) => {
     const handleSendOtp = async () => {
         if (!canResend) return;
         try {
-            await dispatch(resendOtp({ email, mailType: "registration" })).unwrap();
+            await dispatch(resendOtp({ email, mailType: verifyType })).unwrap();
             toast.success("OTP resend successfully");
             setTimer(60);
             setCanResend(false);
@@ -81,8 +94,8 @@ const VerifyOtp = ({ email }: { email: string }) => {
     return (
         <div className="fixed inset-0 z-100 text-black bg-white flex items-center justify-center overflow-y-auto">
             <div className="max-w-md w-full px-6 py-12 flex flex-col items-center">
-                
-                <motion.div 
+
+                <motion.div
                     initial={{ scale: 0.5, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     className="mb-8 p-4 bg-blue-50 rounded-2xl"
@@ -105,7 +118,7 @@ const VerifyOtp = ({ email }: { email: string }) => {
                                 key={index}
                                 type="text"
                                 maxLength={1}
-                                ref={(el:any) => (inputRefs.current[index] = el)}
+                                ref={(el: any) => (inputRefs.current[index] = el)}
                                 value={data}
                                 onChange={(e) => handleChange(e.target, index)}
                                 onKeyDown={(e) => handleKeyDown(e, index)}
@@ -125,7 +138,7 @@ const VerifyOtp = ({ email }: { email: string }) => {
                             {authLoading ? <Loader2 className="animate-spin h-6 w-6" /> : "Verify & Continue"}
                         </motion.button>
 
-                        <button 
+                        <button
                             type="button"
                             disabled={!canResend}
                             onClick={handleSendOtp}

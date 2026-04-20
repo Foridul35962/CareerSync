@@ -11,7 +11,7 @@ const page = () => {
         <>
             {
                 !verified ? <RegisterPageDesign setVerified={setVerified} setEmail={setEmail} /> :
-                    <VerifyOtp email={email} />
+                    <VerifyOtp email={email} verifyType='registration' />
             }
         </>
     )
