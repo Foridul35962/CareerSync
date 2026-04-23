@@ -26,6 +26,18 @@ app.use(createProxyMiddleware({
     }
 }));
 
+app.use(createProxyMiddleware({
+    pathFilter: '/api/user',
+    target: process.env.USER_SERVICE,
+    changeOrigin: true,
+    logLevel: "debug",
+    onProxyReq: fixRequestBody,
+    onError: (err, req, res) => {
+        console.error("❌ [PROXY ERROR]:", err.message);
+        res.status(500).json({ error: "Proxy to Auth Service failed" });
+    }
+}));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
