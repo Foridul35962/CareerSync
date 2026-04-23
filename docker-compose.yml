@@ -40,6 +40,24 @@ services:
     networks:
       - careersync-net
 
+  user:
+    build:
+      context: ./services/user
+      dockerfile: Dockerfile
+    container_name: CareerSyncUser
+    restart: unless-stopped
+    ports:
+      - "5001:5000"
+    depends_on:
+      - auth
+    env_file:
+      - .env.docker
+    volumes:
+      - ./services/user:/app
+      - /app/node_modules
+    networks:
+      - careersync-net
+
   utils:
     build:
       context: ./services/utils
