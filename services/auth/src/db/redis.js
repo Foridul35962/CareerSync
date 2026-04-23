@@ -3,7 +3,7 @@ import dotenv from 'dotenv'
 dotenv.config()
 
 const redisUrl = process.env.REDIS_URL;
-const prefix = process.env.REDIS_PREFIX || "clinicFlow";
+const prefix = process.env.REDIS_PREFIX || "carrersync";
 
 if (!redisUrl) {
   console.warn("⚠️ REDIS_URL is not set");
